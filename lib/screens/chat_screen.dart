@@ -310,16 +310,6 @@ class _ChatScreenState extends State<ChatScreen> {
                             fontStyle: FontStyle.italic,
                           ),
                         ),
-                      // Row(
-                      //   mainAxisSize: MainAxisSize.min,
-                      //   children: [
-                      //     if (chat.readStatus == ReadStatus.received)
-                      //       Icon(Icons.done_all, size: 14),
-                      //     if (chat.readStatus == ReadStatus.read)
-                      //       Icon(Icons.done_all,
-                      //           size: 14, color: Colors.indigo),
-                      //   ],
-                      // ),
                     ],
                   ),
                   onTap: () => _openConversation(chat),
