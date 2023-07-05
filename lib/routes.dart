@@ -1,3 +1,4 @@
+import 'package:cipher_comm/screens/welcome_screen.dart';
 import 'package:flutter/material.dart';
 import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
@@ -10,6 +11,7 @@ import 'screens/call_screen.dart';
 
 class AppRoutes {
   static const String home = '/';
+  static const String welcome = '/welcome';
   static const String login = '/login';
   static const String signup = '/signup';
   static const String registration = '/registration';
@@ -22,6 +24,8 @@ class AppRoutes {
     switch (settings.name) {
       case home:
         return MaterialPageRoute(builder: (_) => HomeScreen());
+      case welcome:
+        return MaterialPageRoute(builder: (_) => WelcomeScreen());
       case login:
         return MaterialPageRoute(builder: (_) => LoginScreen());
       case signup:
