@@ -16,7 +16,8 @@ class _HomeScreenState extends State<HomeScreen> {
     ChatScreen(),
     GroupScreen(),
     MeetingScreen(),
-    CallScreen(contactName: 'John Doe',),
+    CallScreen(),
+    // CallScreen(contactName: 'John Doe',),
   ];
 
   @override

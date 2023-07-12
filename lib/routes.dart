@@ -45,11 +45,13 @@ class AppRoutes {
       case meeting:
         return MaterialPageRoute(builder: (_) => MeetingScreen());
       case call:
-      // Extract arguments passed to CallScreen route
-        final args = settings.arguments as Map<String, dynamic>;
-        return MaterialPageRoute(
-          builder: (_) => CallScreen(contactName: args['contactName']),
-        );
+        return MaterialPageRoute(builder: (_) => CallScreen());
+      // case call:
+      // // Extract arguments passed to CallScreen route
+      //   final args = settings.arguments as Map<String, dynamic>;
+      //   return MaterialPageRoute(
+      //     builder: (_) => CallScreen(contactName: args['contactName']),
+      //   );
       default:
         return MaterialPageRoute(builder: (_) => HomeScreen());
     }
