@@ -28,6 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
       body: _screens[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
+        selectedItemColor: Colors.yellow, // Set the selected item color to yellow
         onTap: (index) {
           setState(() {
             _currentIndex = index;
@@ -59,7 +60,6 @@ class _HomeScreenState extends State<HomeScreen> {
             label: 'Settings',
             backgroundColor: Colors.indigo,
           ),
-
         ],
       ),
     );
