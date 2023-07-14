@@ -1,3 +1,4 @@
+import 'package:cipher_comm/screens/settings_screen.dart';
 import 'package:cipher_comm/screens/welcome_screen.dart';
 import 'package:flutter/material.dart';
 import 'screens/home_screen.dart';
@@ -8,6 +9,7 @@ import 'screens/chat_screen.dart';
 import 'screens/group_screen.dart';
 import 'screens/meeting_screen.dart';
 import 'screens/call_screen.dart';
+import 'screens/settings_screen.dart';
 
 class AppRoutes {
   static const String home = '/';
@@ -19,6 +21,7 @@ class AppRoutes {
   static const String group = '/group';
   static const String meeting = '/meeting';
   static const String call = '/call';
+  static const String settings = '/settings';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {

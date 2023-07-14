@@ -4,6 +4,7 @@ import 'call_screen.dart';
 import 'chat_screen.dart';
 import 'group_screen.dart';
 import 'meeting_screen.dart';
+import 'settings_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -17,6 +18,7 @@ class _HomeScreenState extends State<HomeScreen> {
     GroupScreen(),
     MeetingScreen(),
     CallScreen(),
+    SettingsScreen(),
     // CallScreen(contactName: 'John Doe',),
   ];
 
