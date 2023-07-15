@@ -195,7 +195,7 @@ class _GroupScreenState extends State<GroupScreen> {
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.search),
+            icon: Icon(Icons.add),
             onPressed: () {
               // Implement search functionality
             },
