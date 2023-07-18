@@ -270,6 +270,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       Icon(
                         chat.isTyping ? Icons.mode_edit : Icons.done_all,
                         size: 16,
+                        color: Colors.indigo,
                       ),
                       SizedBox(width: 5),
                       Text(

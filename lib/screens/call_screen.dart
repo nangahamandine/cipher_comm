@@ -189,7 +189,7 @@ class _CallScreenState extends State<CallScreen> {
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.more_vert),
+            icon: Icon(Icons.more_vert, color: Colors.indigo,),
             onPressed: () {
               // Implement more options functionality
             },
@@ -205,13 +205,13 @@ class _CallScreenState extends State<CallScreen> {
             title: Text('Friend 1'),
             subtitle: Row(
               children: [
-                Icon(Icons.videocam, size: 16),
+                Icon(Icons.videocam, size: 16, color: Colors.indigo,),
                 SizedBox(width: 5),
                 Text('Video Call - July 4, 10:30 AM'),
               ],
             ),
             trailing: IconButton(
-              icon: Icon(Icons.call),
+              icon: Icon(Icons.call, color: Colors.indigo,),
               onPressed: () => _startCall('video call'),
             ),
           ),
@@ -222,13 +222,13 @@ class _CallScreenState extends State<CallScreen> {
             title: Text('Friend 2'),
             subtitle: Row(
               children: [
-                Icon(Icons.call, size: 16),
+                Icon(Icons.call, size: 16, color: Colors.indigo,),
                 SizedBox(width: 5),
                 Text('Audio Call - July 3, 5:45 PM'),
               ],
             ),
             trailing: IconButton(
-              icon: Icon(Icons.call),
+              icon: Icon(Icons.call, color: Colors.indigo,),
               onPressed: () => _startCall('audio call'),
             ),
           ),
@@ -239,13 +239,13 @@ class _CallScreenState extends State<CallScreen> {
             title: Text('Meeting 1'),
             subtitle: Row(
               children: [
-                Icon(Icons.videocam, size: 16),
+                Icon(Icons.videocam, size: 16, color: Colors.indigo,),
                 SizedBox(width: 5),
                 Text('Video Call - July 2, 2:15 PM'),
               ],
             ),
             trailing: IconButton(
-              icon: Icon(Icons.call),
+              icon: Icon(Icons.call, color: Colors.indigo,),
               onPressed: () => _startCall('video call'),
             ),
           ),
@@ -256,13 +256,13 @@ class _CallScreenState extends State<CallScreen> {
             title: Text('Group Call 1'),
             subtitle: Row(
               children: [
-                Icon(Icons.call, size: 16),
+                Icon(Icons.call, size: 16, color: Colors.indigo,),
                 SizedBox(width: 5),
                 Text('Audio Call - July 1, 5:00 PM'),
               ],
             ),
             trailing: IconButton(
-              icon: Icon(Icons.call),
+              icon: Icon(Icons.call, color: Colors.indigo,),
               onPressed: () => _startCall('audio call'),
             ),
           ),
@@ -274,13 +274,13 @@ class _CallScreenState extends State<CallScreen> {
             title: Text('Friend 3'),
             subtitle: Row(
               children: [
-                Icon(Icons.videocam, size: 16),
+                Icon(Icons.videocam, size: 16, color: Colors.indigo,),
                 SizedBox(width: 5),
                 Text('Video Call - June 30, 3:30 PM'),
               ],
             ),
             trailing: IconButton(
-              icon: Icon(Icons.call),
+              icon: Icon(Icons.call, color: Colors.indigo,),
               onPressed: () => _startCall('video call'),
             ),
           ),
@@ -291,13 +291,13 @@ class _CallScreenState extends State<CallScreen> {
             title: Text('Friend 4'),
             subtitle: Row(
               children: [
-                Icon(Icons.call, size: 16),
+                Icon(Icons.call, size: 16, color: Colors.indigo,),
                 SizedBox(width: 5),
                 Text('Audio Call - June 29, 9:15 AM'),
               ],
             ),
             trailing: IconButton(
-              icon: Icon(Icons.call),
+              icon: Icon(Icons.call, color: Colors.indigo,),
               onPressed: () => _startCall('audio call'),
             ),
           ),
@@ -308,13 +308,13 @@ class _CallScreenState extends State<CallScreen> {
             title: Text('Meeting 2'),
             subtitle: Row(
               children: [
-                Icon(Icons.videocam, size: 16),
+                Icon(Icons.videocam, size: 16, color: Colors.indigo,),
                 SizedBox(width: 5),
                 Text('Video Call - June 28, 4:45 PM'),
               ],
             ),
             trailing: IconButton(
-              icon: Icon(Icons.call),
+              icon: Icon(Icons.call, color: Colors.indigo,),
               onPressed: () => _startCall('video call'),
             ),
           ),
@@ -325,13 +325,13 @@ class _CallScreenState extends State<CallScreen> {
             title: Text('Group Call 2'),
             subtitle: Row(
               children: [
-                Icon(Icons.call, size: 16),
+                Icon(Icons.call, size: 16, color: Colors.indigo,),
                 SizedBox(width: 5),
                 Text('Audio Call - June 27, 1:30 PM'),
               ],
             ),
             trailing: IconButton(
-              icon: Icon(Icons.call),
+              icon: Icon(Icons.call, color: Colors.indigo,),
               onPressed: () => _startCall('audio call'),
             ),
           ),
@@ -342,13 +342,13 @@ class _CallScreenState extends State<CallScreen> {
             title: Text('Friend 5'),
             subtitle: Row(
               children: [
-                Icon(Icons.videocam, size: 16),
+                Icon(Icons.videocam, size: 16, color: Colors.indigo,),
                 SizedBox(width: 5),
                 Text('Video Call - June 26, 10:00 AM'),
               ],
             ),
             trailing: IconButton(
-              icon: Icon(Icons.call),
+              icon: Icon(Icons.call, color: Colors.indigo,),
               onPressed: () => _startCall('video call'),
             ),
           ),
@@ -360,13 +360,13 @@ class _CallScreenState extends State<CallScreen> {
             title: Text('Friend 6'),
             subtitle: Row(
               children: [
-                Icon(Icons.call, size: 16),
+                Icon(Icons.call, size: 16, color: Colors.indigo,),
                 SizedBox(width: 5),
                 Text('Audio Call - June 25, 6:30 PM'),
               ],
             ),
             trailing: IconButton(
-              icon: Icon(Icons.call),
+              icon: Icon(Icons.call, color: Colors.indigo,),
               onPressed: () => _startCall('audio call'),
             ),
           ),
