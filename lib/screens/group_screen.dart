@@ -185,6 +185,33 @@ class _GroupScreenState extends State<GroupScreen> {
     }
   }
 
+  void createNewGroup() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Create New Group'),
+          content: Text('Do you want to create a new group?'),
+          actions: [
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.pop(context); // Close the dialog
+              },
+            ),
+            TextButton(
+              child: Text('Create'),
+              onPressed: () {
+                // Implement create group functionality
+                Navigator.pop(context); // Close the dialog
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -196,9 +223,7 @@ class _GroupScreenState extends State<GroupScreen> {
         actions: [
           IconButton(
             icon: Icon(Icons.add),
-            onPressed: () {
-              // Implement search functionality
-            },
+            onPressed: createNewGroup, // Updated onPressed callback
           ),
           IconButton(
             icon: Icon(Icons.more_vert),
@@ -238,6 +263,7 @@ class _GroupScreenState extends State<GroupScreen> {
                       Icon(
                         group.isTyping ? Icons.mode_edit : Icons.done_all,
                         size: 16,
+                        color: Colors.indigo,
                       ),
                       SizedBox(width: 5),
                       Text(
