@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:contacts_service/contacts_service.dart';
+import 'package:clipboard/clipboard.dart';
 import 'package:intl/intl.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -340,10 +341,12 @@ class ConversationScreen extends StatefulWidget {
 
 
 class _ConversationScreenState extends State<ConversationScreen> {
+  final FocusNode _messageFocusNode = FocusNode();
   List<Message> messages = [];
   TextEditingController _messageController = TextEditingController();
   bool isRecording = false;
   File? selectedFile;
+  int? editingIndex;
 
   @override
   void initState() {
@@ -368,14 +371,93 @@ class _ConversationScreenState extends State<ConversationScreen> {
     String text = _messageController.text.trim();
     if (text.isNotEmpty) {
       setState(() {
-        messages.add(Message(
-          sender: 'User',
-          text: text,
-          time: DateTime.now(),
-        ));
+        if (editingIndex != null) {
+          // If we are editing a message, update the existing message
+          messages[editingIndex!] = Message(
+            sender: 'User',
+            text: text,
+            time: DateTime.now(),
+          );
+          editingIndex = null;
+        } else {
+          // Otherwise, add a new message
+          messages.add(Message(
+            sender: 'User',
+            text: text,
+            time: DateTime.now(),
+          ));
+        }
         _messageController.clear();
       });
     }
+  }
+
+  void _editMessage(Message message) {
+    // When edit button is pressed, fill the message controller with the current message text
+    setState(() {
+      _messageController.text = message.text;
+      editingIndex = messages.indexOf(message);
+    });
+  }
+
+  void _deleteMessage(Message message) {
+    setState(() {
+      messages.remove(message);
+    });
+  }
+
+  void _viewMessageInfo(Message message) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Message Info'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Sender: ${message.sender}'),
+              SizedBox(height: 4),
+              Text('Time: ${DateFormat.yMd().add_jm().format(message.time)}'),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _copyMessage(Message message) {
+    FlutterClipboard.copy(message.text)
+        .then((value) => print('Copied to clipboard: ${message.text}'));
+    // Show a snackbar or toast message indicating the message has been copied
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Message copied to clipboard'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _replyToMessage(Message message) {
+    _messageController.text = 'Reply to ${message.sender}: ${message.text}\n';
+    _messageController.selection =
+        TextSelection.fromPosition(TextPosition(offset: _messageController.text.length));
+    FocusScope.of(context).requestFocus(_messageFocusNode);
+  }
+
+  void _forwardMessage(Message message) {
+    _messageController.text = 'Forwarded Message:\n${message.text}\n';
+    _messageController.selection =
+        TextSelection.fromPosition(TextPosition(offset: _messageController.text.length));
+    FocusScope.of(context).requestFocus(_messageFocusNode);
+  }
+
+  void _starMessage(Message message) {
+    // You can update the message to mark it as starred in your data model.
+    // For this example, I'm updating the UI only (changing the color of the message bubble).
+    setState(() {
+      message.isStarred = !message.isStarred;
+    });
   }
 
   void _startRecording() {
@@ -400,6 +482,132 @@ class _ConversationScreenState extends State<ConversationScreen> {
   // Helper function to hide the keyboard when needed
   void _hideKeyboard() {
     FocusScope.of(context).unfocus();
+  }
+
+  void _showMessageOptions(Message message) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Message Options'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              ListTile(
+                leading: Icon(Icons.edit, color: Colors.indigo,),
+                title: Text('Edit Message'),
+                onTap: () {
+                  Navigator.pop(context); // Close the pop-up
+                  _editMessage(message);
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.delete, color: Colors.red,),
+                title: Text('Delete Message'),
+                onTap: () {
+                  Navigator.pop(context); // Close the pop-up
+                  _deleteMessage(message);
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.info, color: Colors.indigo,),
+                title: Text('View Message Info'),
+                onTap: () {
+                  Navigator.pop(context); // Close the pop-up
+                  _viewMessageInfo(message);
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.copy, color: Colors.indigo,),
+                title: Text('Copy Message'),
+                onTap: () {
+                  Navigator.pop(context); // Close the pop-up
+                  _copyMessage(message);
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.reply, color: Colors.indigo,),
+                title: Text('Reply to Message'),
+                onTap: () {
+                  Navigator.pop(context); // Close the pop-up
+                  _replyToMessage(message);
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.forward, color: Colors.indigo,),
+                title: Text('Forward Message'),
+                onTap: () {
+                  Navigator.pop(context); // Close the pop-up
+                  _forwardMessage(message);
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.star, color: Colors.yellow),
+                title: Text('Star Message'),
+                onTap: () {
+                  Navigator.pop(context); // Close the pop-up
+                  _starMessage(message);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildMessageBubble(Message message) {
+    final isUserMessage = message.sender == 'User';
+
+    return GestureDetector(
+      onLongPress: () {
+        if (isUserMessage) {
+          _showMessageOptions(message); // Show the pop-up menu
+        }
+      },
+      child: Container(
+        padding: EdgeInsets.all(8.0),
+        margin: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+        decoration: BoxDecoration(
+          color: isUserMessage ? Colors.indigo : Colors.grey[300],
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              message.sender,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: isUserMessage ? Colors.white : Colors.black,
+              ),
+            ),
+            if (message.isStarred)
+              Icon(
+                Icons.star,
+                size: 16,
+                color: Colors.yellow,
+              ),
+            SizedBox(height: 4),
+            Text(
+              message.text,
+              style: TextStyle(
+                color: isUserMessage ? Colors.white : Colors.black,
+              ),
+            ),
+            SizedBox(height: 4),
+            Text(
+              DateFormat.jm().format(message.time),
+              style: TextStyle(
+                fontSize: 12,
+                color: isUserMessage ? Colors.white : Colors.black,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -444,45 +652,11 @@ class _ConversationScreenState extends State<ConversationScreen> {
                 itemCount: messages.length,
                 itemBuilder: (context, index) {
                   final message = messages[index];
-                  bool isUserMessage = message.sender == 'User';
-
                   return Align(
-                    alignment: isUserMessage ? Alignment.centerRight : Alignment.centerLeft,
-                    child: Container(
-                      padding: EdgeInsets.all(8.0),
-                      margin: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
-                      decoration: BoxDecoration(
-                        color: isUserMessage ? Colors.indigo : Colors.grey[300],
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            message.sender,
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: isUserMessage ? Colors.white : Colors.black,
-                            ),
-                          ),
-                          SizedBox(height: 4),
-                          Text(
-                            message.text,
-                            style: TextStyle(
-                              color: isUserMessage ? Colors.white : Colors.black,
-                            ),
-                          ),
-                          SizedBox(height: 4),
-                          Text(
-                            DateFormat.jm().format(message.time),
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: isUserMessage ? Colors.white : Colors.black,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                    alignment: message.sender == 'User'
+                        ? Alignment.centerRight
+                        : Alignment.centerLeft,
+                    child: _buildMessageBubble(message),
                   );
                 },
               ),
@@ -497,18 +671,31 @@ class _ConversationScreenState extends State<ConversationScreen> {
                   onPressed: _selectFile,
                 ),
                 Expanded(
-                  child: TextField(
-                    controller: _messageController,
-                    decoration: InputDecoration.collapsed(hintText: 'Type a message'),
+                  child: Focus(
+                    // Use Focus widget to handle focus behavior
+                    onFocusChange: (hasFocus) {
+                      // Handle focus changes if needed
+                    },
+                    child: TextField(
+                      controller: _messageController,
+                      focusNode: _messageFocusNode,
+                      decoration: InputDecoration.collapsed(hintText: 'Type a message'),
+                    ),
                   ),
                 ),
-                IconButton(
-                  icon: Icon(isRecording ? Icons.stop : Icons.mic),
-                  onPressed: isRecording ? _stopRecording : _startRecording,
+                Container(
+                  height: 48.0, // Set the height of the send button container
+                  child: IconButton(
+                    icon: Icon(isRecording ? Icons.stop : Icons.mic),
+                    onPressed: isRecording ? _stopRecording : _startRecording,
+                  ),
                 ),
-                IconButton(
-                  icon: Icon(Icons.send),
-                  onPressed: _sendMessage,
+                Container(
+                  height: 48.0, // Set the height of the send button container
+                  child: IconButton(
+                    icon: Icon(Icons.send),
+                    onPressed: _sendMessage,
+                  ),
                 ),
               ],
             ),
@@ -525,11 +712,13 @@ class Message {
   final String sender;
   final String text;
   final DateTime time;
+  bool isStarred;
 
   Message({
     required this.sender,
     required this.text,
     required this.time,
+    this.isStarred = false,
   });
 }
 

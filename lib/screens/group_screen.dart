@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:clipboard/clipboard.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -317,22 +318,407 @@ class _GroupScreenState extends State<GroupScreen> {
   }
 }
 
-class ConversationScreen extends StatelessWidget {
+
+class ConversationScreen extends StatefulWidget {
   final Group group;
 
   const ConversationScreen({required this.group});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(group.groupName),
+  _ConversationScreenState createState() => _ConversationScreenState();
+}
+
+
+class _ConversationScreenState extends State<ConversationScreen> {
+  final FocusNode _messageFocusNode = FocusNode();
+  List<Message> messages = [];
+  TextEditingController _messageController = TextEditingController();
+  bool isRecording = false;
+  File? selectedFile;
+  int? editingIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    // Load initial messages (This is just an example, you can load messages from your own data source)
+    messages = [
+      Message(
+        sender: 'John Doe',
+        text: 'Hey, how\'s it going?',
+        time: DateTime.now(),
       ),
-      body: Center(
-        child: Text('Conversation Screen'),
+      Message(
+        sender: 'Jane Smith',
+        text: 'I\'m good, thank you!',
+        time: DateTime.now().add(Duration(minutes: 2)),
+      ),
+      // Add more initial messages as needed
+    ];
+  }
+
+
+  void _sendMessage() {
+    String text = _messageController.text.trim();
+    if (text.isNotEmpty) {
+      setState(() {
+        if (editingIndex != null) {
+          // If we are editing a message, update the existing message
+          messages[editingIndex!] = Message(
+            sender: 'User',
+            text: text,
+            time: DateTime.now(),
+          );
+          editingIndex = null;
+        } else {
+          // Otherwise, add a new message
+          messages.add(Message(
+            sender: 'User',
+            text: text,
+            time: DateTime.now(),
+          ));
+        }
+        _messageController.clear();
+      });
+    }
+  }
+
+  // Helper function to hide the keyboard when needed
+  void _hideKeyboard() {
+    FocusScope.of(context).unfocus();
+  }
+  bool _isUserAdmin() {
+    // TODO: Replace this with your own logic to determine if the user is an admin.
+    // For now, we assume the user is an admin if their name is "Admin".
+    return widget.group.groupName == "Admin";
+  }
+
+  bool _isUserMessage(Message message) {
+    // Check if the message sender matches the user's name.
+    // You can use your own authentication system or other means to determine this.
+    return message.sender == "User";
+  }
+
+  bool _canEditMessage(Message message) {
+    // The user can edit their own messages, and the admin can edit all messages.
+    return _isUserMessage(message) || _isUserAdmin();
+  }
+
+  bool _canDeleteMessage(Message message) {
+    // Only the user who sent the message and the admin can delete it.
+    return _isUserMessage(message) || _isUserAdmin();
+  }
+
+  void _editMessage(Message message) {
+    // The edit functionality should now be restricted to allowed users.
+    if (_canEditMessage(message)) {
+      // Implement the edit message functionality here.
+    }
+  }
+
+  void _deleteMessage(Message message) {
+    // The delete functionality should now be restricted to allowed users.
+    if (_canDeleteMessage(message)) {
+      // Implement the delete message functionality here.
+      setState(() {
+        messages.remove(message);
+      });
+    }
+  }
+
+  void _viewMessageInfo(Message message) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Message Info'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Sender: ${message.sender}'),
+              SizedBox(height: 4),
+              Text('Time: ${DateFormat.yMd().add_jm().format(message.time)}'),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _copyMessage(Message message) {
+    FlutterClipboard.copy(message.text)
+        .then((value) => print('Copied to clipboard: ${message.text}'));
+    // Show a snackbar or toast message indicating the message has been copied
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Message copied to clipboard'),
+        duration: Duration(seconds: 2),
       ),
     );
   }
+
+  void _replyToMessage(Message message) {
+    // Set up the reply message UI
+    setState(() {
+      _messageController.text = ''; // Clear the text
+      editingIndex = null;
+      _messageController.text = ''; // Clear the text
+      isRecording = false; // Close voice recording if open
+      _messageController.text = 'Replied to ${message.sender}: ${message.text}\n';
+      _messageFocusNode.requestFocus(); // Place the cursor at the end
+      _messageController.selection = TextSelection.fromPosition(
+        TextPosition(offset: _messageController.text.length),
+      ); // Place the cursor at the end
+    });
+  }
+
+  void _toggleStarMessage(Message message) {
+    setState(() {
+      message.isStarred = !message.isStarred;
+    });
+  }
+
+  void _forwardMessage(Message message) {
+    // Set up the forward message UI
+    setState(() {
+      _messageController.text = ''; // Clear the text
+      editingIndex = null;
+      _messageController.text = ''; // Clear the text
+      isRecording = false; // Close voice recording if open
+      _messageController.text = 'Forwarded message:\n${message.text}\n';
+      _messageFocusNode.requestFocus(); // Place the cursor at the end
+      _messageController.selection = TextSelection.fromPosition(
+        TextPosition(offset: _messageController.text.length),
+      ); // Place the cursor at the end
+    });
+  }
+
+  void _showMessageOptions(Message message) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Message Options'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (_canEditMessage(message))
+                ListTile(
+                  leading: Icon(Icons.edit, color: Colors.indigo,),
+                  title: Text('Edit Message'),
+                  onTap: () {
+                    Navigator.pop(context); // Close the pop-up
+                    _editMessage(message);
+                  },
+                ),
+              if (_canDeleteMessage(message))
+                ListTile(
+                  leading: Icon(Icons.delete, color: Colors.red,),
+                  title: Text('Delete Message'),
+                  onTap: () {
+                    Navigator.pop(context); // Close the pop-up
+                    _deleteMessage(message);
+                  },
+                ),
+              ListTile(
+                leading: Icon(Icons.info, color: Colors.indigo,),
+                title: Text('View Message Info'),
+                onTap: () {
+                  Navigator.pop(context); // Close the pop-up
+                  _viewMessageInfo(message);
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.copy, color: Colors.indigo,),
+                title: Text('Copy Message'),
+                onTap: () {
+                  Navigator.pop(context); // Close the pop-up
+                  _copyMessage(message);
+                },
+              ),
+              ListTile(
+                leading: Icon(
+                  message.isStarred ? Icons.star : Icons.star_border,
+                  color: message.isStarred ? Colors.amber : Colors.indigo,
+                ),
+                title: Text(message.isStarred ? 'Unstar Message' : 'Star Message'),
+                onTap: () {
+                  Navigator.pop(context); // Close the pop-up
+                  _toggleStarMessage(message);
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.reply, color: Colors.indigo,),
+                title: Text('Reply to Message'),
+                onTap: () {
+                  Navigator.pop(context); // Close the pop-up
+                  _replyToMessage(message);
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.forward, color: Colors.indigo,),
+                title: Text('Forward Message'),
+                onTap: () {
+                  Navigator.pop(context); // Close the pop-up
+                  _forwardMessage(message);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.group.groupName),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.call),
+            onPressed: () {
+              // TODO: Implement group call functionality
+            },
+          ),
+        ],
+      ),
+      body: GestureDetector(
+        onTap: () {
+          if (_messageFocusNode.hasFocus) {
+            _hideKeyboard();
+          }
+        },
+        child: Column(
+          children: [
+            Expanded( // Wrap the ListView.builder with Expanded to avoid RenderFlex overflow
+              child: ListView.builder(
+                itemCount: messages.length,
+                itemBuilder: (context, index) {
+                  Message message = messages[index];
+                  bool isUserMessage = _isUserMessage(message);
+                  return GestureDetector(
+                    onTap: () => _showMessageOptions(message),
+                    child: Container(
+                      margin: EdgeInsets.symmetric(
+                        horizontal: 16.0,
+                        vertical: 8.0,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isUserMessage ? Colors.blue[100] : Colors.grey[200],
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                  message.sender,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                SizedBox(width: 8.0),
+                                Text(
+                                  DateFormat.jm().format(message.time),
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 12.0,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            if (message.isReply && message.repliedMessage != null)
+                              Container(
+                                padding: EdgeInsets.symmetric(vertical: 8.0),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[200],
+                                  borderRadius: BorderRadius.circular(5.0),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Replied to ${message.repliedMessage!.sender}:',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    SizedBox(height: 4.0),
+                                    Text(
+                                      message.repliedMessage!.text,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            SizedBox(height: 4.0),
+                            Text(message.text),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 8.0),
+              color: Colors.grey[200],
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.attach_file),
+                    onPressed: () {
+                      // TODO: Implement file attachment functionality
+                    },
+                  ),
+                  Expanded(
+                    child: TextField(
+                      controller: _messageController,
+                      focusNode: _messageFocusNode,
+                      textInputAction: TextInputAction.send,
+                      onSubmitted: (_) => _sendMessage(),
+                      decoration: InputDecoration.collapsed(
+                        hintText: 'Type a message...',
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.send),
+                    onPressed: _sendMessage,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class Message {
+  final String sender;
+  final String text;
+  final DateTime time;
+  bool isStarred;
+  bool isReply;
+  Message? repliedMessage;
+
+  Message({
+    required this.sender,
+    required this.text,
+    required this.time,
+    this.isStarred = false,
+    this.isReply = false,
+    this.repliedMessage,
+  });
 }
 
 void main() {
