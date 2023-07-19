@@ -42,6 +42,7 @@ dependencies:
   contacts_service: ^0.6.3
   intl: ^0.18.1
   permission_handler: ^10.4.2
+  clipboard: ^0.1.3
 
 dev_dependencies:
   flutter_test:
