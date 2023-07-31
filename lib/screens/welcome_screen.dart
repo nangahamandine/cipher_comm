@@ -3,7 +3,17 @@ import 'package:google_fonts/google_fonts.dart';
 import 'login_screen.dart';
 import 'signup_screen.dart';
 
-class WelcomeScreen extends StatelessWidget {
+class WelcomeScreen extends StatefulWidget {
+  @override
+  _WelcomeScreenState createState() => _WelcomeScreenState();
+}
+
+class _WelcomeScreenState extends State<WelcomeScreen> {
+  String selectedLanguage = 'English'; // Initially set to English
+
+  // List of available languages
+  List<String> languages = ['English', 'French'];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,14 +29,14 @@ class WelcomeScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Container(
-              padding: EdgeInsets.fromLTRB(40, 80, 40, 20), // Adjust the padding
+              padding: EdgeInsets.fromLTRB(40, 80, 40, 20),
               child: Image(
                 image: AssetImage('assets/images/PNGLogo.png'),
                 fit: BoxFit.scaleDown,
-                height: 180, // Adjust the height of the logo
+                height: 180,
               ),
             ),
-            SizedBox(height: 80,),
+            SizedBox(height: 80),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 40),
               child: Column(
@@ -43,7 +53,7 @@ class WelcomeScreen extends StatelessWidget {
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  SizedBox(height: 80), // Adjust the spacing
+                  SizedBox(height: 80),
                   Container(
                     width: double.infinity,
                     child: ElevatedButton(
@@ -94,6 +104,21 @@ class WelcomeScreen extends StatelessWidget {
                         ),
                       ),
                     ),
+                  ),
+                  SizedBox(height: 24),
+                  DropdownButton<String>(
+                    value: selectedLanguage,
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selectedLanguage = newValue!;
+                      });
+                    },
+                    items: languages.map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
                   ),
                 ],
               ),
