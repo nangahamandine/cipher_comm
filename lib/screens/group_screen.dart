@@ -412,6 +412,10 @@ class _ConversationScreenState extends State<ConversationScreen> {
     // The edit functionality should now be restricted to allowed users.
     if (_canEditMessage(message)) {
       // Implement the edit message functionality here.
+      setState(() {
+        _messageController.text = message.text;
+        editingIndex = messages.indexOf(message);
+      });
     }
   }
 

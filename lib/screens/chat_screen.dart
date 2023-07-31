@@ -257,66 +257,68 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
           ),
           Expanded(
-            child: ListView.builder(
-              itemCount: filteredChats.length,
-              itemBuilder: (context, index) {
-                final chat = filteredChats[index];
-                return ListTile(
-                  leading: CircleAvatar(
-                    backgroundImage: AssetImage(chat.profilePhoto),
-                  ),
-                  title: Text(chat.contactName),
-                  subtitle: Row(
-                    children: [
-                      Icon(
-                        chat.isTyping ? Icons.mode_edit : Icons.done_all,
-                        size: 16,
-                        color: Colors.indigo,
-                      ),
-                      SizedBox(width: 5),
-                      Text(
-                        chat.lastMessage,
-                        style: TextStyle(color: Colors.grey),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,),
-                    ],
-                  ),
-                  trailing: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(chat.lastMessageTime),
-                      SizedBox(height: 4),
-                      if (chat.messageCount > 0)
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 4,
-                            vertical: 0,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.yellow,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Text(
-                            '${chat.messageCount}',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
+            child: Flexible(
+              child: ListView.builder(
+                itemCount: filteredChats.length,
+                itemBuilder: (context, index) {
+                  final chat = filteredChats[index];
+                  return ListTile(
+                    leading: CircleAvatar(
+                      backgroundImage: AssetImage(chat.profilePhoto),
+                    ),
+                    title: Text(chat.contactName),
+                    subtitle: Row(
+                      children: [
+                        Icon(
+                          chat.isTyping ? Icons.mode_edit : Icons.done_all,
+                          size: 16,
+                          color: Colors.indigo,
+                        ),
+                        SizedBox(width: 5),
+                        Text(
+                          chat.lastMessage,
+                          style: TextStyle(color: Colors.grey),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,),
+                      ],
+                    ),
+                    trailing: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(chat.lastMessageTime),
+                        SizedBox(height: 4),
+                        if (chat.messageCount > 0)
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 4,
+                              vertical: 0,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.yellow,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Text(
+                              '${chat.messageCount}',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
-                        ),
-                      if (chat.isTyping)
-                        Text(
-                          'Typing...',
-                          style: TextStyle(
-                            fontStyle: FontStyle.italic,
+                        if (chat.isTyping)
+                          Text(
+                            'Typing...',
+                            style: TextStyle(
+                              fontStyle: FontStyle.italic,
+                            ),
                           ),
-                        ),
-                    ],
-                  ),
-                  onTap: () => _openConversation(chat),
-                );
-              },
+                      ],
+                    ),
+                    onTap: () => _openConversation(chat),
+                  );
+                },
+              ),
             ),
           ),
         ],
