@@ -1,6 +1,8 @@
+import 'dart:io';
 import 'package:cipher_comm/screens/welcome_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
 
 class SettingsScreen extends StatelessWidget {
   void _logout(BuildContext context) {
@@ -131,91 +133,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String? _email;
   String? _department;
 
-  void _editProfilePhoto() {
-    // Implement logic for editing profile photo
-    setState(() {
-      // Update the profile photo
-    });
+  Future<void> _showConfirmationDialog(String itemName, VoidCallback onConfirm) async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Confirm Delete'),
+          content: Text('Are you sure you want to delete $itemName?'),
+          actions: [
+            TextButton(
+              child: Text('No'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+            TextButton(
+              child: Text('Yes'),
+              onPressed: () {
+                Navigator.pop(context);
+                onConfirm();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
-  void _deleteProfilePhoto() {
-    // Implement logic for deleting profile photo
-    setState(() {
-      _profilePhoto = null;
-    });
-  }
-
-  void _editUsername() {
-    // Implement logic for editing username
-    setState(() {
-      // Update the username
-    });
-  }
-
-  void _deleteUsername() {
-    // Implement logic for deleting username
-    setState(() {
-      _username = null;
-    });
-  }
-
-  void _editStatus() {
-    // Implement logic for editing status
-    setState(() {
-      // Update the status
-    });
-  }
-
-  void _deleteStatus() {
-    // Implement logic for deleting status
-    setState(() {
-      _status = null;
-    });
-  }
-
-  void _editAccount() {
-    // Implement logic for editing account
-    setState(() {
-      // Update the account
-    });
-  }
-
-  void _deleteAccount() {
-    // Implement logic for deleting account
-    setState(() {
-      _account = null;
-    });
-  }
-
-  void _editEmail() {
-    // Implement logic for editing email
-    setState(() {
-      // Update the email
-    });
-  }
-
-  void _deleteEmail() {
-    // Implement logic for deleting email
-    setState(() {
-      _email = null;
-    });
-  }
-
-  void _editDepartment() {
-    // Implement logic for editing department
-    setState(() {
-      // Update the department
-    });
-  }
-
-  void _deleteDepartment() {
-    // Implement logic for deleting department
-    setState(() {
-      _department = null;
-    });
-  }
-
-  void _showProfilePhotoOptions(BuildContext context) {
+  void _editProfilePhoto() async {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
@@ -224,15 +169,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                leading: Icon(Icons.edit, color: Colors.indigo,),
-                title: Text('Edit Profile Photo'),
-                onTap: () {
+                leading: Icon(Icons.photo_library, color: Colors.indigo,),
+                title: Text('Select from Gallery'),
+                onTap: () async {
                   Navigator.pop(context);
-                  _editProfilePhoto();
+                  final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+                  if (image != null) {
+                    setState(() {
+                      _profilePhoto = image.path;
+                    });
+                  }
                 },
               ),
               ListTile(
-                leading: Icon(Icons.delete, color: Colors.indigo,),
+                leading: Icon(Icons.camera_alt, color: Colors.indigo,),
+                title: Text('Take a Photo'),
+                onTap: () async {
+                  Navigator.pop(context);
+                  final image = await ImagePicker().pickImage(source: ImageSource.camera);
+                  if (image != null) {
+                    setState(() {
+                      _profilePhoto = image.path;
+                    });
+                  }
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.delete, color: Colors.red,),
                 title: Text('Delete Profile Photo'),
                 onTap: () {
                   Navigator.pop(context);
@@ -243,7 +206,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 title: Text('Cancel'),
                 onTap: () {
                   Navigator.pop(context);
-                  _deleteProfilePhoto();
                 },
               ),
             ],
@@ -253,18 +215,356 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  void _deleteProfilePhoto() {
+    // Implement logic for deleting profile photo
+    setState(() {
+      _profilePhoto = null;
+    });
+  }
+
+  void _editUsername() async {
+    String? newName = await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        String? updatedName;
+        return AlertDialog(
+          title: Text('Edit Username'),
+          content: TextField(
+            onChanged: (value) {
+              updatedName = value;
+            },
+            decoration: InputDecoration(hintText: 'Enter your new username'),
+          ),
+          actions: [
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+            TextButton(
+              child: Text('Save'),
+              onPressed: () {
+                setState(() {
+                  _username = updatedName;
+                });
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+    if (newName != null) {
+      setState(() {
+        _username = newName;
+      });
+    }
+  }
+
+  void _editStatus() async {
+    String? newStatus = await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        String? updatedStatus;
+        return AlertDialog(
+          title: Text('Edit Status'),
+          content: TextField(
+            onChanged: (value) {
+              updatedStatus = value;
+            },
+            decoration: InputDecoration(hintText: 'Enter your new status'),
+          ),
+          actions: [
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+            TextButton(
+              child: Text('Save'),
+              onPressed: () {
+                setState(() {
+                  _status = updatedStatus;
+                });
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+    if (newStatus != null) {
+      setState(() {
+        _status = newStatus;
+      });
+    }
+  }
+
+  void _deleteStatus() {
+    // Implement logic for deleting status
+    _showConfirmationDialog('status', () {
+      setState(() {
+        _status = null;
+      });
+    });
+  }
+
+  void _viewAllAccountDetails() async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Account Information'),
+          content: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Account: ${_account ?? 'Not specified'}'),
+              SizedBox(height: 8),
+              Text('Email: ${_email ?? 'Not specified'}'),
+              SizedBox(height: 8),
+              Text('Department: ${_department ?? 'Not specified'}'),
+            ],
+          ),
+          actions: [
+            TextButton(
+              child: Text('Close'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _viewAccount() async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Account Options'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: Icon(Icons.edit, color: Colors.indigo,),
+                title: Text('Edit'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _editAccount();
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.delete, color: Colors.red,),
+                title: Text('Delete'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _deleteAccount();
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.info, color: Colors.indigo,),
+                title: Text('View Information'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _viewAllAccountDetails();
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _editAccount() async {
+    String? newAccount = await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        String? updatedAccount = _account;
+        return AlertDialog(
+          title: Text('Edit Account'),
+          content: TextField(
+            onChanged: (value) {
+              updatedAccount = value;
+            },
+            decoration: InputDecoration(hintText: 'Enter account information'),
+          ),
+          actions: [
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+            TextButton(
+              child: Text('Save'),
+              onPressed: () {
+                setState(() {
+                  _account = updatedAccount;
+                });
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+    if (newAccount != null) {
+      setState(() {
+        _account = newAccount;
+      });
+    }
+  }
+
+  void _deleteAccount() {
+    // Implement logic for deleting account
+    _showConfirmationDialog('account', () {
+      setState(() {
+        _account = null;
+      });
+    });
+  }
+
+  void _editEmail() async {
+    String? newEmail = await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        String? updatedEmail;
+        return AlertDialog(
+          title: Text('Edit Email'),
+          content: TextField(
+            onChanged: (value) {
+              updatedEmail = value;
+            },
+            decoration: InputDecoration(hintText: 'Enter your new email'),
+          ),
+          actions: [
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+            TextButton(
+              child: Text('Save'),
+              onPressed: () {
+                setState(() {
+                  _email = updatedEmail;
+                });
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+    if (newEmail != null) {
+      setState(() {
+        _email = newEmail;
+      });
+    }
+  }
+
+  void _deleteEmail() {
+    // Implement logic for deleting email
+    _showConfirmationDialog('email', () {
+      setState(() {
+        _email = null;
+      });
+    });
+  }
+
+  void _editDepartment() async {
+    String? newDepartment = await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        String? updatedDepartment = _department;
+        return AlertDialog(
+          title: Text('Edit Department'),
+          content: SizedBox(
+            height: 200, // Set the height for the dropdown list
+            child: SingleChildScrollView(
+              child: DropdownButtonFormField<String>(
+                value: updatedDepartment,
+                onChanged: (value) {
+                  updatedDepartment = value;
+                },
+                items: [
+                  'Department 1',
+                  'Department 2',
+                  'Department 3',
+                  'Department 4',
+                  'Department 5',
+                  'Department 6',
+                  'Department 7',
+                  'Department 8',
+                  'Department 9',
+                  'Department 10',
+                ]
+                    .map<DropdownMenuItem<String>>(
+                      (value) => DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  ),
+                )
+                    .toList(),
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+            TextButton(
+              child: Text('Save'),
+              onPressed: () {
+                setState(() {
+                  _department = updatedDepartment;
+                });
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+    if (newDepartment != null) {
+      setState(() {
+        _department = newDepartment;
+      });
+    }
+  }
+
+
+  void _deleteDepartment() {
+    // Implement logic for deleting department
+    _showConfirmationDialog('department', () {
+      setState(() {
+        _department = null;
+      });
+    });
+  }
+
   Widget _buildProfilePhoto() {
     if (_profilePhoto != null) {
       return GestureDetector(
-        onTap: () => _showProfilePhotoOptions(context),
+        onTap: _editProfilePhoto,
         child: CircleAvatar(
           radius: 60,
-          backgroundImage: NetworkImage(_profilePhoto!),
+          backgroundImage: FileImage(File(_profilePhoto!)),
         ),
       );
     } else {
       return GestureDetector(
-        onTap: () => _showProfilePhotoOptions(context),
+        onTap: _editProfilePhoto,
         child: CircleAvatar(
           radius: 60,
           child: Icon(Icons.person),
@@ -289,201 +589,206 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _buildProfilePhoto(), // Display the profile photo
-            SizedBox(height: 40),
-            ListTile(
-              leading: Icon(Icons.person, color: Colors.indigo,),
-              title: Text('Username'),
-              subtitle: _username != null ? Text(_username!) : null,
-              trailing: IconButton(
-                icon: Icon(Icons.more_vert, color: Colors.indigo,),
-                onPressed: () {
-                  showModalBottomSheet(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return Container(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            ListTile(
-                              leading: Icon(Icons.edit, color: Colors.indigo,),
-                              title: Text('Edit'),
-                              onTap: () {
-                                Navigator.pop(context);
-                                _editUsername();
-                              },
-                            ),
-                            ListTile(
-                              leading: Icon(Icons.delete, color: Colors.indigo,),
-                              title: Text('Delete'),
-                              onTap: () {
-                                Navigator.pop(context);
-                                _deleteUsername();
-                              },
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
-            ),
-            ListTile(
-              leading: Icon(Icons.post_add, color: Colors.indigo,),
-              title: Text('Status'),
-              subtitle: _status != null ? Text(_status!) : null,
-              trailing: IconButton(
-                icon: Icon(Icons.more_vert, color: Colors.indigo,),
-                onPressed: () {
-                  showModalBottomSheet(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return Container(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            ListTile(
-                              leading: Icon(Icons.edit, color: Colors.indigo,),
-                              title: Text('Edit'),
-                              onTap: () {
-                                Navigator.pop(context);
-                                _editStatus();
-                              },
-                            ),
-                            ListTile(
-                              leading: Icon(Icons.delete, color: Colors.indigo,),
-                              title: Text('Delete'),
-                              onTap: () {
-                                Navigator.pop(context);
-                                _deleteStatus();
-                              },
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
-            ),
-            ListTile(
-              leading: Icon(Icons.account_circle, color: Colors.indigo,),
-              title: Text('Account'),
-              subtitle: _account != null ? Text(_account!) : null,
-              trailing: IconButton(
-                icon: Icon(Icons.more_vert, color: Colors.indigo,),
-                onPressed: () {
-                  showModalBottomSheet(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return Container(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            ListTile(
-                              leading: Icon(Icons.edit, color: Colors.indigo,),
-                              title: Text('Edit'),
-                              onTap: () {
-                                Navigator.pop(context);
-                                _editAccount();
-                              },
-                            ),
-                            ListTile(
-                              leading: Icon(Icons.delete, color: Colors.indigo,),
-                              title: Text('Delete'),
-                              onTap: () {
-                                Navigator.pop(context);
-                                _deleteAccount();
-                              },
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
-            ),
-            ListTile(
-              leading: Icon(Icons.email, color: Colors.indigo,),
-              title: Text('Email'),
-              subtitle: _email != null ? Text(_email!) : null,
-              trailing: IconButton(
-                icon: Icon(Icons.more_vert, color: Colors.indigo,),
-                onPressed: () {
-                  showModalBottomSheet(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return Container(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            ListTile(
-                              leading: Icon(Icons.edit, color: Colors.indigo,),
-                              title: Text('Edit'),
-                              onTap: () {
-                                Navigator.pop(context);
-                                _editEmail();
-                              },
-                            ),
-                            ListTile(
-                              leading: Icon(Icons.delete, color: Colors.indigo,),
-                              title: Text('Delete'),
-                              onTap: () {
-                                Navigator.pop(context);
-                                _deleteEmail();
-                              },
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
-            ),
-            ListTile(
-              leading: Icon(Icons.work, color: Colors.indigo,),
-              title: Text('Department'),
-              subtitle: _department != null ? Text(_department!) : null,
-              trailing: IconButton(
-                icon: Icon(Icons.more_vert),
-                onPressed: () {
-                  showModalBottomSheet(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return Container(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            ListTile(
-                              leading: Icon(Icons.edit, color: Colors.indigo,),
-                              title: Text('Edit'),
-                              onTap: () {
-                                Navigator.pop(context);
-                                _editDepartment();
-                              },
-                            ),
-                            ListTile(
-                              leading: Icon(Icons.delete, color: Colors.indigo,),
-                              title: Text('Delete'),
-                              onTap: () {
-                                Navigator.pop(context);
-                                _deleteDepartment();
-                              },
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
-            ),
-          ],
+            Expanded(
+                child: ListView(
+                  children: [
+                    SizedBox(height: 40,),
+                    _buildProfilePhoto(), // Display the profile photo
+                    SizedBox(height: 40),
+                    ListTile(
+                      leading: Icon(Icons.person, color: Colors.indigo,),
+                      title: Text('Username'),
+                      subtitle: _username != null ? Text(_username!) : null,
+                      trailing: IconButton(
+                        icon: Icon(Icons.more_vert, color: Colors.indigo,),
+                        onPressed: () {
+                          showModalBottomSheet(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return Container(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    ListTile(
+                                      leading: Icon(Icons.edit, color: Colors.indigo,),
+                                      title: Text('Edit'),
+                                      onTap: () {
+                                        Navigator.pop(context);
+                                        _editUsername();
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                    ListTile(
+                      leading: Icon(Icons.post_add, color: Colors.indigo,),
+                      title: Text('Status'),
+                      subtitle: _status != null ? Text(_status!) : null,
+                      trailing: IconButton(
+                        icon: Icon(Icons.more_vert, color: Colors.indigo,),
+                        onPressed: () {
+                          showModalBottomSheet(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return Container(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    ListTile(
+                                      leading: Icon(Icons.edit, color: Colors.indigo,),
+                                      title: Text('Edit'),
+                                      onTap: () {
+                                        Navigator.pop(context);
+                                        _editStatus();
+                                      },
+                                    ),
+                                    ListTile(
+                                      leading: Icon(Icons.delete, color: Colors.red,),
+                                      title: Text('Delete'),
+                                      onTap: () {
+                                        Navigator.pop(context);
+                                        _deleteStatus();
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                    ListTile(
+                      leading: Icon(Icons.account_circle, color: Colors.indigo,),
+                      title: Text('Account'),
+                      subtitle: _account != null ? Text(_account!) : null,
+                      trailing: IconButton(
+                        icon: Icon(Icons.more_vert, color: Colors.indigo,),
+                        onPressed: () {
+                          showModalBottomSheet(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return Container(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    ListTile(
+                                      leading: Icon(Icons.info, color: Colors.indigo,),
+                                      title: Text('View Information'),
+                                      onTap: () {
+                                        Navigator.pop(context);
+                                        _viewAccount();
+                                      },
+                                    ),
+                                    ListTile(
+                                      leading: Icon(Icons.edit, color: Colors.indigo,),
+                                      title: Text('Edit'),
+                                      onTap: () {
+                                        Navigator.pop(context);
+                                        _editAccount();
+                                      },
+                                    ),
+                                    ListTile(
+                                      leading: Icon(Icons.delete, color: Colors.red,),
+                                      title: Text('Delete'),
+                                      onTap: () {
+                                        Navigator.pop(context);
+                                        _deleteAccount();
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                    ListTile(
+                      leading: Icon(Icons.email, color: Colors.indigo,),
+                      title: Text('Email'),
+                      subtitle: _email != null ? Text(_email!) : null,
+                      trailing: IconButton(
+                        icon: Icon(Icons.more_vert, color: Colors.indigo,),
+                        onPressed: () {
+                          showModalBottomSheet(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return Container(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    ListTile(
+                                      leading: Icon(Icons.edit, color: Colors.indigo,),
+                                      title: Text('Edit'),
+                                      onTap: () {
+                                        Navigator.pop(context);
+                                        _editEmail();
+                                      },
+                                    ),
+                                    ListTile(
+                                      leading: Icon(Icons.delete, color: Colors.red,),
+                                      title: Text('Delete'),
+                                      onTap: () {
+                                        Navigator.pop(context);
+                                        _deleteEmail();
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                    ListTile(
+                      leading: Icon(Icons.work, color: Colors.indigo,),
+                      title: Text('Department'),
+                      subtitle: _department != null ? Text(_department!) : null,
+                      trailing: IconButton(
+                        icon: Icon(Icons.more_vert, color: Colors.indigo,),
+                        onPressed: () {
+                          showModalBottomSheet(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return Container(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    ListTile(
+                                      leading: Icon(Icons.edit, color: Colors.indigo,),
+                                      title: Text('Edit'),
+                                      onTap: () {
+                                        Navigator.pop(context);
+                                        _editDepartment();
+                                      },
+                                    ),
+                                    ListTile(
+                                      leading: Icon(Icons.delete, color: Colors.red,),
+                                      title: Text('Delete'),
+                                      onTap: () {
+                                        Navigator.pop(context);
+                                        _deleteDepartment();
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ))
+          ]
         ),
       ),
     );
