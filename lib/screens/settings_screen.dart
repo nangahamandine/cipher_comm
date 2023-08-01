@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 
+//Line 9 to 130 includes code for the Settings Screen (First screen displayed)
+
 class SettingsScreen extends StatelessWidget {
   void _logout(BuildContext context) {
     showDialog(
@@ -39,6 +41,13 @@ class SettingsScreen extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => ProfileScreen()),
+    );
+  }
+
+  void _navigateToHelp(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => HelpScreen()),
     );
   }
 
@@ -97,7 +106,7 @@ class SettingsScreen extends StatelessWidget {
             leading: Icon(Icons.help_outline, color: Colors.indigo,),
             title: Text('Help'),
             onTap: () {
-              // Navigate to the help screen
+              _navigateToHelp(context); // Navigate to the help screen
             },
           ),
           ListTile(
@@ -119,6 +128,8 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 }
+
+//Line 134 to 807 includes code for the Profile Screen and Profile Screen state
 
 class ProfileScreen extends StatefulWidget {
   @override
@@ -794,3 +805,118 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 }
+
+class HelpScreen extends StatefulWidget {
+  @override
+  _HelpScreenState createState() => _HelpScreenState();
+}
+
+class _HelpScreenState extends State<HelpScreen> {
+  List<HelpTopic> allTopics = [
+    HelpTopic(title: 'Search for Help', subtitle: 'Use the search bar to find help topics.'),
+    HelpTopic(title: 'Contact Support', subtitle: 'Get in touch with our support team.'),
+    HelpTopic(title: 'About This App', subtitle: 'Learn more about this app and version.'),
+    HelpTopic(title: 'FAQs', subtitle: 'Frequently Asked Questions.'),
+    HelpTopic(title: 'Give Feedback', subtitle: 'Provide feedback or report issues.'),
+    HelpTopic(title: 'Security', subtitle: 'Learn about your data security and privacy.'),
+    HelpTopic(title: 'App Settings', subtitle: 'Explore and customize app settings.'),
+    HelpTopic(title: 'Terms and Conditions', subtitle: 'Read the terms and conditions of the app usage.'),
+    HelpTopic(title: 'Privacy Policy', subtitle: 'Read our privacy policy.'),
+  ];
+
+  List<HelpTopic> displayedTopics = [];
+
+  @override
+  void initState() {
+    super.initState();
+    displayedTopics = allTopics;
+  }
+
+  // Function to show a SnackBar with the given message
+  void _showSnackBar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
+  // Function to handle the search functionality
+  void _handleSearch(String query) {
+    if (query.isEmpty) {
+      // If the search query is empty, show all help topics
+      setState(() {
+        displayedTopics = allTopics;
+      });
+    } else {
+      // Filter the help topics based on the search query
+      setState(() {
+        displayedTopics = allTopics
+            .where((topic) =>
+        topic.title.toLowerCase().contains(query.toLowerCase()) ||
+            topic.subtitle.toLowerCase().contains(query.toLowerCase()))
+            .toList();
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'Help',
+          style: GoogleFonts.openSans(
+            textStyle: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            TextField(
+              onChanged: _handleSearch, // Call _handleSearch when the text changes
+              decoration: InputDecoration(
+                labelText: 'Search',
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(height: 16),
+            Expanded(
+              child: ListView.builder(
+                itemCount: displayedTopics.length,
+                itemBuilder: (context, index) {
+                  HelpTopic topic = displayedTopics[index];
+                  return ListTile(
+                    leading: Icon(Icons.info_outline, color: Colors.indigo),
+                    title: Text(topic.title),
+                    subtitle: Text(topic.subtitle),
+                    onTap: () {
+                      // Implement navigation to the specific help topic
+                      _showSnackBar(context, 'Navigate to ${topic.title}');
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class HelpTopic {
+  final String title;
+  final String subtitle;
+
+  HelpTopic({required this.title, required this.subtitle});
+}
+
