@@ -1,8 +1,11 @@
 import 'dart:io';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:clipboard/clipboard.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -476,9 +479,228 @@ class _ConversationScreenState extends State<ConversationScreen> {
     });
   }
 
-  void _selectFile() async {
-    // TODO: Implement file selection logic (e.g., using file picker package)
-    // You can update the `selectedFile` variable with the selected file
+  Future<void> _selectFile() async {
+    await showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return SafeArea(
+          child: Wrap(
+            children: [
+              ListTile(
+                leading: Icon(Icons.attach_file, color: Colors.indigo,),
+                title: Text('Attach Document'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickDocument();
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.photo_library, color: Colors.indigo,),
+                title: Text('Attach Photo or Video'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickPhotoOrVideo();
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.contact_mail, color: Colors.indigo,),
+                title: Text('Attach Contact'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickContact();
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.location_on, color: Colors.indigo,),
+                title: Text('Send Live Location'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _sendLiveLocation();
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.poll, color: Colors.indigo,),
+                title: Text('Create Poll'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _openPollDialog;
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.camera_alt, color: Colors.indigo,),
+                title: Text('Take Photo'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _takePhoto();
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  // Helper functions for each attachment option
+
+  Future<void> _pickDocument() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['pdf', 'doc', 'docx', 'txt'], // Add other supported extensions if needed
+    );
+
+    if (result != null && result.files.isNotEmpty) {
+      File file = File(result.files.single.path!);
+      // Do something with the selected document file
+    }
+  }
+
+  Future<void> _pickPhotoOrVideo() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.media,
+      allowedExtensions: ['jpg', 'jpeg', 'png', 'gif', 'mp4', 'mov'], // Add other supported extensions if needed
+    );
+
+    if (result != null && result.files.isNotEmpty) {
+      File file = File(result.files.single.path!);
+      // Do something with the selected photo or video file
+    }
+  }
+
+  Future<void> _pickContact() async {
+    Iterable<Contact> contacts = await ContactsService.getContacts();
+    // Display the contacts in a dialog or any other way you prefer
+    // When the user selects a contact, addChatFromContact(contact) can be called similar to what you have done before
+  }
+
+
+  Future<void> _sendLiveLocation() async {
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      // Location services are not enabled
+      return;
+    }
+
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        // Location permissions are denied
+        return;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      // Location permissions are permanently denied
+      return;
+    }
+
+    Position position = await Geolocator.getCurrentPosition();
+    // Use the 'position' object to get the latitude and longitude and send it as the live location
+    // You can use this information to display the location on the map or send it as a text message
+  }
+
+  Future<void> _showPollDialog(BuildContext context) async {
+    String question = '';
+    List<String> options = ['', '']; // Initialize with two empty options
+
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text('Create a Poll'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    decoration: InputDecoration(labelText: 'Question'),
+                    onChanged: (value) {
+                      setState(() {
+                        question = value;
+                      });
+                    },
+                  ),
+                  SizedBox(height: 16),
+                  ...List.generate(
+                    options.length,
+                        (index) => TextField(
+                      decoration: InputDecoration(labelText: 'Option ${index + 1}'),
+                      onChanged: (value) {
+                        setState(() {
+                          options[index] = value;
+                        });
+                      },
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        options.add(''); // Add a new empty option
+                      });
+                    },
+                    child: Text('Add Option'),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text('Cancel'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    // Validate the inputs before submitting the poll
+                    if (question.trim().isEmpty || options.any((option) => option.trim().isEmpty)) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Please fill in the question and all options.'),
+                          duration: Duration(seconds: 2),
+                        ),
+                      );
+                      return;
+                    }
+
+                    // Create the poll object and do something with it
+                    Poll poll = Poll(question: question, options: options);
+                    _handlePollSubmission(poll);
+
+                    // Close the dialog
+                    Navigator.pop(context);
+                  },
+                  child: Text('Send'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  // Function to handle poll submission
+  void _handlePollSubmission(Poll poll) {
+    // You can send the poll to the recipient or store it in the conversation as needed
+    // For this example, let's just print the poll data
+    print('Poll Question: ${poll.question}');
+    print('Poll Options: ${poll.options}');
+  }
+
+  void _openPollDialog() {
+    _showPollDialog(context);
+  }
+
+  Future<void> _takePhoto() async {
+    final imagePicker = ImagePicker();
+    XFile? pickedFile = await imagePicker.pickImage(source: ImageSource.camera);
+
+    if (pickedFile != null) {
+      File file = File(pickedFile.path);
+      // Do something with the captured photo
+    }
   }
 
   // Helper function to hide the keyboard when needed
@@ -748,4 +970,11 @@ class Chat {
     required this.isTyping,
     required this.readStatus,
   });
+}
+
+class Poll {
+  String question;
+  List<String> options;
+
+  Poll({required this.question, required this.options});
 }
