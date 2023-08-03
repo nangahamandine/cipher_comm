@@ -392,14 +392,18 @@ class ProfilePhotoScreen extends StatelessWidget {
 class ProfileInfoScreen extends StatelessWidget {
   final String contactName;
   final String profilePhoto;
+  final String status;
   final String phoneNumber;
   final String email;
+  final String department;
 
   const ProfileInfoScreen({
     required this.contactName,
     required this.profilePhoto,
     required this.phoneNumber,
     required this.email,
+    required this.status,
+    required this.department,
   });
 
   @override
@@ -429,6 +433,14 @@ class ProfileInfoScreen extends StatelessWidget {
             SizedBox(height: 8),
             Text(
               'Email: $email',
+              style: TextStyle(fontSize: 18),
+            ),
+            Text(
+              'Department: $department',
+              style: TextStyle(fontSize: 18),
+            ),
+            Text(
+              'Status: $status',
               style: TextStyle(fontSize: 18),
             ),
           ],
@@ -482,8 +494,10 @@ class _ConversationScreenState extends State<ConversationScreen> {
         builder: (context) => ProfileInfoScreen(
           contactName: widget.chat.contactName,
           profilePhoto: widget.chat.profilePhoto,
-          phoneNumber: '+1 123 456 7890', // Replace with the contact's actual phone number
-          email: 'user@example.com', // Replace with the contact's actual email
+          phoneNumber: '+1 123 456 7890',
+          email: 'user@example.com',
+          status: 'Active',
+          department: 'Department A',
         ),
       ),
     );
