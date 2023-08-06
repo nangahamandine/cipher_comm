@@ -575,6 +575,28 @@ class _ConversationScreenState extends State<ConversationScreen> {
     );
   }
 
+  void _initiateGroupCall() {
+    // TODO: Implement the group call functionality here
+    // This is just a placeholder, and you should replace it with your actual implementation
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Group Call'),
+          content: Text('Initiating a group call...'),
+          actions: [
+            TextButton(
+              child: Text('Close'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -584,9 +606,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
         actions: [
           IconButton(
             icon: Icon(Icons.call),
-            onPressed: () {
-              // TODO: Implement group call functionality
-            },
+            onPressed: _initiateGroupCall,
           ),
         ],
       ),
