@@ -392,6 +392,7 @@ class ProfilePhotoScreen extends StatelessWidget {
 class ProfileInfoScreen extends StatelessWidget {
   final String contactName;
   final String profilePhoto;
+  // final String media; LOOK MORE INTO THIS
   final String status;
   final String phoneNumber;
   final String email;

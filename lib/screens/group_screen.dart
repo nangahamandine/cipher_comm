@@ -213,13 +213,35 @@ class _GroupScreenState extends State<GroupScreen> {
     );
   }
 
+  void _showGroupProfile(Group group) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Group Profile'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircleAvatar(
+                radius: 40,
+                backgroundImage: AssetImage(group.groupPhoto),
+              ),
+              SizedBox(height: 16),
+              Text(group.groupName),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
           'Group Chats',
-          style: GoogleFonts.lato(fontWeight: FontWeight.bold),
+          style: GoogleFonts.openSans(fontWeight: FontWeight.bold),
         ),
         actions: [
           IconButton(
@@ -255,8 +277,11 @@ class _GroupScreenState extends State<GroupScreen> {
               itemBuilder: (context, index) {
                 Group group = filteredGroups[index];
                 return ListTile(
-                  leading: CircleAvatar(
-                    backgroundImage: AssetImage(group.groupPhoto),
+                  leading: GestureDetector(
+                    onTap: () => _showGroupProfile(group),
+                    child: CircleAvatar(
+                      backgroundImage: AssetImage(group.groupPhoto),
+                    ),
                   ),
                   title: Text(group.groupName),
                   subtitle: Row(
@@ -575,15 +600,15 @@ class _ConversationScreenState extends State<ConversationScreen> {
     );
   }
 
-  void _initiateGroupCall() {
-    // TODO: Implement the group call functionality here
+  void _initiateGroupAudioCall() {
+    // TODO: Implement the group audio call functionality here
     // This is just a placeholder, and you should replace it with your actual implementation
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
           title: Text('Group Call'),
-          content: Text('Initiating a group call...'),
+          content: Text('Initiating a group audio call...'),
           actions: [
             TextButton(
               child: Text('Close'),
@@ -597,16 +622,56 @@ class _ConversationScreenState extends State<ConversationScreen> {
     );
   }
 
+  void _initiateGroupVideoCall() {
+    // TODO: Implement the group video call functionality here
+    // This is just a placeholder, and you should replace it with your actual implementation
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Group Call'),
+          content: Text('Initiating a group video call...'),
+          actions: [
+            TextButton(
+              child: Text('Close'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _openProfileInfo() {
+  //  TODO: Implement logic for profile info
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.group.groupName),
+        title: GestureDetector(
+          onTap: _openProfileInfo,
+          child: Row(
+            children: [
+              CircleAvatar(),
+              SizedBox(width: 8.0),
+              Text(widget.group.groupName),
+            ],
+          ),
+        ),
         actions: [
           IconButton(
             icon: Icon(Icons.call),
-            onPressed: _initiateGroupCall,
+            onPressed: _initiateGroupAudioCall,
+          ),
+          IconButton(
+            icon: Icon(Icons.videocam),
+            onPressed: _initiateGroupVideoCall,
           ),
         ],
       ),
@@ -745,19 +810,70 @@ class Message {
   });
 }
 
-void main() {
-  runApp(MyApp());
-}
 
-class MyApp extends StatelessWidget {
+class ProfilePhotoScreen extends StatelessWidget {
+  final String profilePhoto;
+
+  const ProfilePhotoScreen({required this.profilePhoto});
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Group Chats',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+    return Scaffold(
+      backgroundColor: Colors.black, // Set the background color for the screen
+      body: Center(
+        child: GestureDetector(
+          onTap: () {
+            Navigator.pop(context); // When the user taps on the screen, pop the screen to go back
+          },
+          child: Hero(
+            tag: 'profile_photo_${profilePhoto}',
+            child: Image.asset(profilePhoto),
+          ),
+        ),
       ),
-      home: GroupScreen(),
     );
   }
 }
+
+
+class ProfileInfoScreen extends StatelessWidget {
+  final String groupName;
+  final String groupPhoto;
+  final String description;
+  final String groupLink;
+  final List<Action> groupParticipants;
+  final String department;
+
+  const ProfileInfoScreen({
+    required this.groupName,
+    required this.groupPhoto,
+    required this.description,
+    required this.groupLink,
+    required this.groupParticipants,
+    required this.department,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    throw UnimplementedError();
+  }
+}
+
+
+// void main() {
+//   runApp(MyApp());
+// }
+//
+// class MyApp extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       title: 'Group Chats',
+//       theme: ThemeData(
+//         primarySwatch: Colors.blue,
+//       ),
+//       home: GroupScreen(),
+//     );
+//   }
+// }

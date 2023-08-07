@@ -46,7 +46,6 @@ dependencies:
   image_picker: ^1.0.1
   file_picker: ^5.3.1
   geolocator: ^9.0.2
-  cloud_firestore: ^4.8.4
 
 dev_dependencies:
   flutter_test:
