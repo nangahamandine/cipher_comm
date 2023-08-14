@@ -220,6 +220,27 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
+  void _viewProfilePhoto(BuildContext context, String profilePhoto) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ProfilePhotoScreen(profilePhoto: profilePhoto),
+      ),
+    );
+  }
+
+  Widget _buildAvatar(String profilePhoto) {
+    return GestureDetector(
+      onTap: () => _viewProfilePhoto(context, profilePhoto),
+      child: Hero(
+        tag: 'profile_photo_$profilePhoto',
+        child: CircleAvatar(
+          backgroundImage: AssetImage(profilePhoto),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     filteredChats.sort((a, b) => a.lastMessageTime.compareTo(b.lastMessageTime));
@@ -266,9 +287,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 itemBuilder: (context, index) {
                   final chat = filteredChats[index];
                   return ListTile(
-                    leading: CircleAvatar(
-                      backgroundImage: AssetImage(chat.profilePhoto),
-                    ),
+                    leading: _buildAvatar(chat.profilePhoto),
                     title: Text(chat.contactName),
                     subtitle: Row(
                       children: [
@@ -345,6 +364,94 @@ class ConversationScreen extends StatefulWidget {
 }
 
 
+class ProfilePhotoScreen extends StatelessWidget {
+  final String profilePhoto;
+
+  const ProfilePhotoScreen({required this.profilePhoto});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black, // Set the background color for the screen
+      body: Center(
+        child: GestureDetector(
+          onTap: () {
+            Navigator.pop(context); // When the user taps on the screen, pop the screen to go back
+          },
+          child: Hero(
+            tag: 'profile_photo_${profilePhoto}',
+            child: Image.asset(profilePhoto),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+
+class ProfileInfoScreen extends StatelessWidget {
+  final String contactName;
+  final String profilePhoto;
+  // final String media; LOOK MORE INTO THIS
+  final String status;
+  final String phoneNumber;
+  final String email;
+  final String department;
+
+  const ProfileInfoScreen({
+    required this.contactName,
+    required this.profilePhoto,
+    required this.phoneNumber,
+    required this.email,
+    required this.status,
+    required this.department,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Profile Information'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircleAvatar(
+              backgroundImage: AssetImage(profilePhoto),
+              radius: 60,
+            ),
+            SizedBox(height: 16),
+            Text(
+              contactName,
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Phone Number: $phoneNumber',
+              style: TextStyle(fontSize: 18),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Email: $email',
+              style: TextStyle(fontSize: 18),
+            ),
+            Text(
+              'Department: $department',
+              style: TextStyle(fontSize: 18),
+            ),
+            Text(
+              'Status: $status',
+              style: TextStyle(fontSize: 18),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+
 class _ConversationScreenState extends State<ConversationScreen> {
   final FocusNode _messageFocusNode = FocusNode();
   List<Message> messages = [];
@@ -370,6 +477,41 @@ class _ConversationScreenState extends State<ConversationScreen> {
       ),
       // Add more initial messages as needed
     ];
+  }
+
+  void _viewProfilePhoto(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ProfilePhotoScreen(profilePhoto: widget.chat.profilePhoto),
+      ),
+    );
+  }
+
+  void _openProfileInfo() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ProfileInfoScreen(
+          contactName: widget.chat.contactName,
+          profilePhoto: widget.chat.profilePhoto,
+          phoneNumber: '+1 123 456 7890',
+          email: 'user@example.com',
+          status: 'Active',
+          department: 'Department A',
+        ),
+      ),
+    );
+  }
+
+  void _initiateAudioCall() {
+    // TODO: Replace this function with your actual implementation to initiate an audio call
+    print('Initiating audio call with ${widget.chat.contactName}');
+  }
+
+  void _initiateVideoCall() {
+    // TODO: Replace this function with your actual implementation to initiate a video call
+    print('Initiating video call with ${widget.chat.contactName}');
   }
 
   void _sendMessage() {
@@ -781,6 +923,18 @@ class _ConversationScreenState extends State<ConversationScreen> {
     );
   }
 
+  Widget _buildAvatar() {
+    return GestureDetector(
+      onTap: () => _viewProfilePhoto(context),
+      child: Hero(
+        tag: 'profile_photo_${widget.chat.contactName}',
+        child: CircleAvatar(
+          backgroundImage: AssetImage(widget.chat.profilePhoto),
+        ),
+      ),
+    );
+  }
+
   Widget _buildMessageBubble(Message message) {
     final isUserMessage = message.sender == 'User';
 
@@ -838,27 +992,24 @@ class _ConversationScreenState extends State<ConversationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          children: [
-            CircleAvatar(
-              backgroundImage: AssetImage(widget.chat.profilePhoto),
-            ),
-            SizedBox(width: 8.0),
-            Text(widget.chat.contactName),
-          ],
+        title: GestureDetector(
+          onTap: _openProfileInfo,
+          child: Row(
+            children: [
+              _buildAvatar(),
+              SizedBox(width: 8.0),
+              Text(widget.chat.contactName),
+            ],
+          ),
         ),
         actions: [
           IconButton(
             icon: Icon(Icons.call),
-            onPressed: () {
-              // TODO: Implement audio call functionality
-            },
+            onPressed: _initiateAudioCall,
           ),
           IconButton(
             icon: Icon(Icons.videocam),
-            onPressed: () {
-              // TODO: Implement video call functionality
-            },
+            onPressed: _initiateVideoCall,
           ),
         ],
       ),

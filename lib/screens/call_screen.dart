@@ -15,6 +15,13 @@ class _CallScreenState extends State<CallScreen> {
   bool isVideoEnabled = true;
   List<String> participants = ['Friend 1'];
 
+  // Add a list to store call history
+  List<CallEntry> callHistory = [
+    CallEntry('Friend 1', 'Video Call', 'July 4, 10:30 AM'),
+    CallEntry('Friend 2', 'Audio Call', 'July 3, 5:45 PM'),
+    // Add more call entries as needed
+  ];
+
   void _startCall(String type) {
     showDialog(
       context: context,
@@ -111,6 +118,18 @@ class _CallScreenState extends State<CallScreen> {
     });
   }
 
+  void _searchCallHistory() async {
+    final selectedResult = await showSearch<CallEntry?>(
+      context: context,
+      delegate: CallHistorySearchDelegate(callHistory: callHistory),
+    );
+
+    // Check if the user selected a search result or closed the search without selecting anything
+    if (selectedResult != null) {
+      // Handle the selected result (e.g., initiate a call or navigate to a detailed call screen)
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return isInCall
@@ -166,7 +185,7 @@ class _CallScreenState extends State<CallScreen> {
                 ElevatedButton(
                   onPressed: _endCall,
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.red, // Set the button color to red
+                   backgroundColor: Colors.red, // Set the button color to red
                   ),
                   child: Icon(Icons.call_end),
                 ),
@@ -189,7 +208,11 @@ class _CallScreenState extends State<CallScreen> {
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.more_vert, color: Colors.indigo,),
+            icon: Icon(Icons.search),
+            onPressed: _searchCallHistory,
+          ),
+          IconButton(
+            icon: Icon(Icons.more_vert),
             onPressed: () {
               // Implement more options functionality
             },
@@ -373,5 +396,78 @@ class _CallScreenState extends State<CallScreen> {
         ],
       ),
     );
+  }
+}
+
+
+// Class to represent a call entry
+class CallEntry {
+  final String name;
+  final String callType;
+  final String timestamp;
+
+  CallEntry(this.name, this.callType, this.timestamp);
+}
+
+// Custom search delegate class for call history search
+class CallHistorySearchDelegate extends SearchDelegate<CallEntry?> {
+  final List<CallEntry> callHistory;
+
+  CallHistorySearchDelegate({required this.callHistory});
+
+  @override
+  List<Widget> buildActions(BuildContext context) {
+    return [
+      IconButton(
+        icon: Icon(Icons.clear),
+        onPressed: () {
+          query = '';
+        },
+      )
+    ];
+  }
+
+  @override
+  Widget buildLeading(BuildContext context) {
+    return IconButton(
+      icon: Icon(Icons.arrow_back),
+      onPressed: () {
+        close(context, null);
+      },
+    );
+  }
+
+  @override
+  Widget buildResults(BuildContext context) {
+    // Implement the search results based on the query
+    final searchResults = callHistory.where((entry) {
+      return entry.name.toLowerCase().contains(query.toLowerCase()) ||
+          entry.callType.toLowerCase().contains(query.toLowerCase()) ||
+          entry.timestamp.toLowerCase().contains(query.toLowerCase());
+    }).toList();
+
+
+    return ListView.builder(
+      itemCount: searchResults.length,
+      itemBuilder: (context, index) {
+        final result = searchResults[index];
+        return ListTile(
+          title: Text(result.name),
+          subtitle: Text('${result.callType} - ${result.timestamp}'),
+          // Handle tap on the search result
+          onTap: () {
+            // You can add actions here when a search result is tapped.
+            // For example, you might want to initiate a call or navigate to a detailed call screen.
+            close(context, result);
+          },
+        );
+      },
+    );
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    // Implement suggestions when the user types in the search bar (optional).
+    return Container();
   }
 }

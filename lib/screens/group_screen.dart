@@ -213,13 +213,40 @@ class _GroupScreenState extends State<GroupScreen> {
     );
   }
 
+  void _showGroupProfile(Group group) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Group Profile'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircleAvatar(
+                radius: 40,
+                backgroundImage: AssetImage(group.groupPhoto),
+              ),
+              SizedBox(height: 16),
+              Text(group.groupName),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
           'Group Chats',
-          style: GoogleFonts.lato(fontWeight: FontWeight.bold),
+          style: GoogleFonts.openSans(
+            textStyle: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ),
         actions: [
           IconButton(
@@ -255,8 +282,11 @@ class _GroupScreenState extends State<GroupScreen> {
               itemBuilder: (context, index) {
                 Group group = filteredGroups[index];
                 return ListTile(
-                  leading: CircleAvatar(
-                    backgroundImage: AssetImage(group.groupPhoto),
+                  leading: GestureDetector(
+                    onTap: () => _showGroupProfile(group),
+                    child: CircleAvatar(
+                      backgroundImage: AssetImage(group.groupPhoto),
+                    ),
                   ),
                   title: Text(group.groupName),
                   subtitle: Row(
@@ -575,18 +605,163 @@ class _ConversationScreenState extends State<ConversationScreen> {
     );
   }
 
+  void _initiateGroupAudioCall() {
+    // TODO: Implement the group audio call functionality here
+    // This is just a placeholder, and you should replace it with your actual implementation
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Group Call'),
+          content: Text('Initiating a group audio call...'),
+          actions: [
+            TextButton(
+              child: Text('Close'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _initiateGroupVideoCall() {
+    // TODO: Implement the group video call functionality here
+    // This is just a placeholder, and you should replace it with your actual implementation
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Group Call'),
+          content: Text('Initiating a group video call...'),
+          actions: [
+            TextButton(
+              child: Text('Close'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showGroupProfile(Group group) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Group Profile'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ProfileInfoScreen(
+                        groupName: group.groupName,
+                        groupPhoto: group.groupPhoto,
+                        description: 'This is a work group for project collaboration.',
+                        groupLink: 'https://example.com/work-group',
+                        groupParticipants: [
+                          Action(
+                            icon: Icons.person,
+                            title: 'John Doe',
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ParticipantProfileScreen(name: 'John Doe'),
+                                ),
+                              );
+                            },
+                          ),
+                          Action(
+                            icon: Icons.person,
+                            title: 'Jane Smith',
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ParticipantProfileScreen(name: 'Jane Smith'),
+                                ),
+                              );
+                            },
+                          ),
+                          Action(
+                            icon: Icons.person,
+                            title: 'Michael Johnson',
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ParticipantProfileScreen(name: 'Michael Johnson'),
+                                ),
+                              );
+                            },
+                          ),
+                          Action(
+                            icon: Icons.person,
+                            title: 'Emily Williams',
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ParticipantProfileScreen(name: 'Emily Williams'),
+                                ),
+                              );
+                            },
+                          ),
+                          // Add more participants as needed
+                        ],
+                        department: 'Engineering',
+                      ),
+                    ),
+                  );
+
+                },
+                child: CircleAvatar(
+                  radius: 40,
+                  backgroundImage: AssetImage(group.groupPhoto),
+                ),
+              ),
+              SizedBox(height: 16),
+              Text(group.groupName),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.group.groupName),
+        title: GestureDetector(
+          onTap: () => _showGroupProfile(widget.group), // Wrap in lambda
+          child: Row(
+            children: [
+              CircleAvatar(),
+              SizedBox(width: 8.0),
+              Text(widget.group.groupName),
+            ],
+          ),
+        ),
         actions: [
           IconButton(
             icon: Icon(Icons.call),
-            onPressed: () {
-              // TODO: Implement group call functionality
-            },
+            onPressed: _initiateGroupAudioCall,
+          ),
+          IconButton(
+            icon: Icon(Icons.videocam),
+            onPressed: _initiateGroupVideoCall,
           ),
         ],
       ),
@@ -725,19 +900,155 @@ class Message {
   });
 }
 
-void main() {
-  runApp(MyApp());
-}
 
-class MyApp extends StatelessWidget {
+class ProfilePhotoScreen extends StatelessWidget {
+  final String profilePhoto;
+
+  const ProfilePhotoScreen({required this.profilePhoto});
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Group Chats',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+    return Scaffold(
+      backgroundColor: Colors.black, // Set the background color for the screen
+      body: Center(
+        child: GestureDetector(
+          onTap: () {
+            Navigator.pop(context); // When the user taps on the screen, pop the screen to go back
+          },
+          child: Hero(
+            tag: 'profile_photo_${profilePhoto}',
+            child: Image.asset(profilePhoto),
+          ),
+        ),
       ),
-      home: GroupScreen(),
     );
   }
 }
+
+
+class ProfileInfoScreen extends StatelessWidget {
+  final String groupName;
+  final String groupPhoto;
+  final String description;
+  final String groupLink;
+  final List<Action> groupParticipants;
+  final String department;
+
+  const ProfileInfoScreen({
+    required this.groupName,
+    required this.groupPhoto,
+    required this.description,
+    required this.groupLink,
+    required this.groupParticipants,
+    required this.department,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Group Profile'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            CircleAvatar(
+              radius: 80,
+              backgroundImage: AssetImage(groupPhoto),
+            ),
+            SizedBox(height: 16),
+            Text(
+              groupName,
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 8),
+            Text(
+              description,
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 16, color: Colors.grey),
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Department: $department',
+              style: TextStyle(fontSize: 16),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Group Link: $groupLink',
+              style: TextStyle(fontSize: 16, color: Colors.blue),
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Participants:',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 8),
+            Column(
+              children: groupParticipants.map((action) {
+                return ListTile(
+                  leading: Icon(action.icon),
+                  title: Text(action.title),
+                  onTap: action.onTap,
+                );
+              }).toList(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class Action {
+  final IconData icon;
+  final String title;
+  final VoidCallback onTap;
+
+  Action({
+    required this.icon,
+    required this.title,
+    required this.onTap,
+  });
+}
+
+class ParticipantProfileScreen extends StatelessWidget {
+  final String name;
+
+  const ParticipantProfileScreen({required this.name});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Participant Profile'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircleAvatar(
+              radius: 50,
+              backgroundImage: AssetImage('assets/images/profile_placeholder.png'),
+            ),
+            SizedBox(height: 16),
+            Text(
+              name,
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Department: Engineering', // You can customize this information
+              style: TextStyle(fontSize: 16),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+
+
+

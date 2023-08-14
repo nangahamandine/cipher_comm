@@ -22,7 +22,7 @@ class SettingsScreen extends StatelessWidget {
               },
             ),
             TextButton(
-              child: Text('Logout'),
+              child: Text('Logout', style: TextStyle(color: Colors.red),),
               onPressed: () {
                 Navigator.pushAndRemoveUntil(
                   context,

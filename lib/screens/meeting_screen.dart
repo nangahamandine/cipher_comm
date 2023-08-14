@@ -395,12 +395,14 @@ class _MeetingScreenState extends State<MeetingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Meetings', style: GoogleFonts.openSans(
-          textStyle: TextStyle(
-            fontSize: 24, // Set your desired font size
-            fontWeight: FontWeight.bold, // Set the font weight to bold
+        title: Text(
+          'Meetings',
+          style: GoogleFonts.openSans(
+            textStyle: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-        ),
         ),
         elevation: 0,
         backgroundColor: Colors.indigo,
