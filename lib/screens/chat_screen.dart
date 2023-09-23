@@ -235,11 +235,17 @@ class _ChatScreenState extends State<ChatScreen> {
       child: Hero(
         tag: 'profile_photo_$profilePhoto',
         child: CircleAvatar(
-          backgroundImage: AssetImage(profilePhoto),
+          backgroundImage: profilePhoto.isNotEmpty
+              ? AssetImage(profilePhoto)
+              : null,
+          child: profilePhoto.isEmpty
+              ? Icon(Icons.person) // Replace with your default icon
+              : null,
         ),
       ),
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
